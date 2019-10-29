@@ -1,7 +1,7 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "git.h"
+#include <git.h>
 
 int main() {
     // Demo that our macros work.
