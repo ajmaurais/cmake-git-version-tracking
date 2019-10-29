@@ -82,6 +82,7 @@ function(GitStateChangedAction _state_as_list)
     LIST(GET _state_as_list 0 GIT_RETRIEVED_STATE)
     LIST(GET _state_as_list 1 GIT_HEAD_SHA1)
     LIST(GET _state_as_list 2 GIT_IS_DIRTY)
+    LIST(GET _state_as_list 3 GIT_LAST_COMMIT_DATE)
     configure_file("${PRE_CONFIGURE_FILE}" "${POST_CONFIGURE_FILE}" @ONLY)
 endfunction()
 
@@ -128,8 +129,21 @@ function(GetGitState _working_dir _state)
         endif()
     endif()
 
+    #get last commit date and time
+    execute_process(COMMAND
+        "${GIT_EXECUTABLE}" log -1 --format=%cd --date=local
+        WORKING_DIRECTORY "${_working_dir}"
+        RESULT_VARIABLE res
+        OUTPUT_VARIABLE _gitdate
+        ERROR_QUIET
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if(NOT res EQUAL 0)
+        set(_success "false")
+        set(_gitdate "GIT-NOTFOUND")
+    endif()
+
     # Return a list of our variables to the parent scope.
-    set(${_state} ${_success} ${_hashvar} ${_dirty} PARENT_SCOPE)
+    set(${_state} ${_success} ${_hashvar} ${_dirty} ${_gitdate} PARENT_SCOPE)
 endfunction()
 
 
